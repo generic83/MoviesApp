@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MoviesApp.Converters;
+using MoviesApp.SystemIo;
 
 namespace MoviesApp
 {
@@ -28,6 +29,7 @@ namespace MoviesApp
             });
 
             services.AddScoped<IJsonConvert, JsonConvert>();
+            services.AddScoped<IFile, File>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
