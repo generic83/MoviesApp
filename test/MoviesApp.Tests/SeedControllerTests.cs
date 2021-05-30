@@ -11,6 +11,10 @@ using MoviesApp.Data.Models;
 using MoviesApp.Controllers;
 using MoviesApp.Converters;
 using MoviesApp.SystemIo;
+using MoviesApp.Data.Models.Entities;
+using MoviesApp.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace MoviesStore.Tests.Controllers
 {
@@ -36,18 +40,38 @@ namespace MoviesStore.Tests.Controllers
             var sourceFilePath = "Data/Source/movies.json";
             var sourceStream = new MemoryStream();
             _file.OpenRead(Arg.Any<string>()).Returns(sourceStream);
-            var deserializedJsonSource = _builder.CreateListOfSize<MovieJsonModel>(10).Build();
-            
+            var deserializedJsonSource = _builder.CreateListOfSize<MovieJsonModel>(10)
+                .All()
+                .With(x => x.Stills = new[] { "Still1", "Still2" })
+                .With(x => x.SoundEffects = new[] { SoundEffectsEnum.RX6.ToString(), SoundEffectsEnum.SDDS.ToString() })
+                .Build();
+
+            var options = new DbContextOptionsBuilder<MovieInMemoryDbContext>().UseInMemoryDatabase(databaseName: "SeedControllerTestDb").Options;
+
             _jsonConvert.DeserializeAsync<ICollection<MovieJsonModel>>(sourceStream, Arg.Is<JsonSerializerOptions>(x => x.PropertyNameCaseInsensitive == true))
                 .Returns(deserializedJsonSource);
 
-            var controller = new SeedController(_jsonConvert, _file);
-            var result = await controller.Import() as JsonResult;
+            JsonResult result = null;
+            using (var context = new MovieInMemoryDbContext(options))
+            {
+                var controller = new SeedController(
+                _jsonConvert,
+                _file,
+                context);
+
+                result = await controller.Import() as JsonResult;
+            }
+
+            int totalImported = 0;
+            using (var context = new MovieInMemoryDbContext(options))
+            {
+                totalImported = context.Movies.Count();
+            }
 
             _file.Received(1).OpenRead(sourceFilePath);
             await _jsonConvert.Received(1).DeserializeAsync<ICollection<MovieJsonModel>>(sourceStream, Arg.Any<JsonSerializerOptions>());
-
             result.Value.Should().NotBeNull();
+            totalImported.Should().Be(10);
         }
     }
 }
