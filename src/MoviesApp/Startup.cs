@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using MoviesApp.Converters;
 using MoviesApp.Data;
 using MoviesApp.SystemIo;
+using MoviesStore.Data;
 
 namespace MoviesApp
 {
@@ -28,6 +29,11 @@ namespace MoviesApp
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
+            });
+
+            services.AddControllersWithViews()
+                .AddJsonOptions(options => {
+                    options.JsonSerializerOptions.WriteIndented = true;
             });
 
             services.AddDbContext<MovieInMemoryDbContext>(opt => opt.UseInMemoryDatabase("MoviesDb"));
