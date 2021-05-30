@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MoviesApp.Converters;
+using MoviesApp.Data;
 using MoviesApp.SystemIo;
 
 namespace MoviesApp
@@ -28,6 +30,8 @@ namespace MoviesApp
                 configuration.RootPath = "ClientApp/dist";
             });
 
+            services.AddDbContext<MovieInMemoryDbContext>(opt => opt.UseInMemoryDatabase("MoviesDb"));
+            services.AddScoped<MovieInMemoryDbContext>();
             services.AddScoped<IJsonConvert, JsonConvert>();
             services.AddScoped<IFile, File>();
         }
