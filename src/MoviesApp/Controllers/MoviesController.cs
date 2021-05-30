@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MoviesApp.Data.Models.Entities;
+using MoviesApp.Data.Models;
 using MoviesStore.Data;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MoviesApp.Controllers
@@ -9,17 +8,19 @@ namespace MoviesApp.Controllers
     [Route("api/[controller]")]
     public class MoviesController : ControllerBase
     {
-        private readonly IMovieRepository _movieRepository;
+        private readonly IMovieRepository _repository;
 
         public MoviesController(IMovieRepository movieRepository)
         {
-            _movieRepository = movieRepository;
+            _repository = movieRepository;
         }
 
         [HttpGet]
-        public async Task<ICollection<Movie>> GetMovies()
+        [Route("{pageIndex?}/{pageSize?}")]
+        public async Task<ActionResult<MovieApiResult>> GetMovies(int pageIndex = 0, int pageSize = 10)
         {
-            return await _movieRepository.GetAllMoviesAsync();
+
+            return await MovieApiResult.CreateAsync(_repository.GetAllAsQueryable(), pageIndex, pageSize);
         }
     }
 }

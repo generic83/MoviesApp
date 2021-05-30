@@ -2,6 +2,7 @@
 using MoviesApp.Data.Models.Entities;
 using MoviesStore.Data;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MoviesApp.Data
@@ -15,9 +16,9 @@ namespace MoviesApp.Data
             _dbContext = dbContext;
         }
 
-        public async Task<ICollection<Movie>> GetAllMoviesAsync()
+        public IQueryable<Movie> GetAllAsQueryable()
         {
-            return await _dbContext.Movies.ToListAsync();
+            return _dbContext.Movies.AsNoTracking().AsQueryable();
         }
     }
 }
