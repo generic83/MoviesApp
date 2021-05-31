@@ -67,7 +67,6 @@ describe('MoviesDetailsComponent', () => {
   // synchronous beforeEach()
   beforeEach(() => {
     fixture = TestBed.createComponent(MovieDetailsComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
