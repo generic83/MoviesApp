@@ -20,5 +20,15 @@ namespace MoviesApp.Data
         {
             return _dbContext.Movies.AsNoTracking().AsQueryable();
         }
+
+        public async Task<ICollection<string>> GetAllLocationsAsync()
+        {
+            return await _dbContext.Movies.AsNoTracking().Select(x => x.Location.ToLowerInvariant()).Distinct().ToListAsync();
+        }
+
+        public async Task<ICollection<string>> GetAllLanguagesAsync()
+        {
+            return await _dbContext.Movies.AsNoTracking().Select(x => x.Language.ToLowerInvariant()).Distinct().ToListAsync();
+        }
     }
 }
