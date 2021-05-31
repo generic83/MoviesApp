@@ -22,10 +22,15 @@ namespace MoviesApp.Data.Models
 
         public static async Task<MovieApiResult> CreateAsync(IQueryable<Movie> source,
                                                              int pageIndex,
-                                                             int pageSize, string sortColumn, string sortOrder)
+                                                             int pageSize,
+                                                             string sortColumn,
+                                                             string sortOrder,
+                                                             string titleFilterQuery)
         {
-
-            var count = await source.CountAsync();
+            if (!string.IsNullOrEmpty(titleFilterQuery))
+            {
+                source = source.Where(x => x.Title.ToLowerInvariant().Contains(titleFilterQuery.ToLowerInvariant()));
+            }
 
             if (!string.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn))
             {
@@ -35,6 +40,8 @@ namespace MoviesApp.Data.Models
 
                 source = source.OrderBy($"{sortColumn} {sortOrder}");
             }
+
+            var count = await source.CountAsync();
 
             var data = await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync();
 

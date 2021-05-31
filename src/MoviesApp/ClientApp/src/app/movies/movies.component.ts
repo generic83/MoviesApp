@@ -19,6 +19,7 @@ export class MoviesComponent implements OnInit {
   defaultPageSize = 10;
   defaultSortColumn = "title";
   defaultSortOrder = "asc";
+  filterQuery: string = null;
 
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -30,10 +31,11 @@ export class MoviesComponent implements OnInit {
     this.loadData();
   }
 
-  loadData() {
+  loadData(query: string = null) {
     const pageEvent = new PageEvent();
     pageEvent.pageIndex = this.defaultPageIndex;
     pageEvent.pageSize = this.defaultPageSize;
+    query ? this.filterQuery = query : this.filterQuery = null;
     this.getData(pageEvent);
   }
 
@@ -44,12 +46,16 @@ export class MoviesComponent implements OnInit {
     const sortOrder = (this.sort)
       ? this.sort.direction
       : this.defaultSortOrder;
+    const filterQuery = (this.filterQuery)
+      ? this.filterQuery
+      : null;
 
     this.movieService.getData<ApiResult<Movie>>(
       event.pageIndex,
       event.pageSize,
       sortColumn,
-      sortOrder)
+      sortOrder,
+      filterQuery)
       .subscribe(result => {
         this.sort.disableClear = true;
         this.paginator.length = result.totalCount;

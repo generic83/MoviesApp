@@ -1,5 +1,14 @@
 <p *ngIf="!movies"><em>Loading...</em></p>
 
+<div class="row" [hidden]="!movies">
+<div class="col-md-4">
+  <mat-form-field>
+    <input #filter matInput (keyup)="loadData($event.target.value)"
+           placeholder="Filter by title (or part of it)...">
+  </mat-form-field>
+</div>
+</div>
+
 <table mat-table [dataSource]="movies" class="mat-elevation-z8"
        [hidden]="!movies" matSort (matSortChange)="loadData(filter ? filter.value : null)" matSortActive="{{defaultSortColumn}}" matSortDirection="{{defaultSortOrder}}">
 

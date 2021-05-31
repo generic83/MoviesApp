@@ -73,11 +73,20 @@ describe('MoviesComponent', () => {
     component.paginator = jasmine.createSpyObj(
       "MatPaginator", ["length", "pageIndex", "pageSize"]
     );
+    component.sort = jasmine.createSpyObj(
+      "MatSort", ["disableClear"]
+    );
     fixture.detectChanges();
   });
 
   // tests
-  it('should contain a table with a list of one or more movies',
+  it('should contain a title input filter', async(() => {
+    const titleFilter = fixture.nativeElement
+      .querySelector('.mat-form-field-type-mat-input');
+    expect(titleFilter.textContent).toEqual('Filter by title (or part of it)...');
+  }));
+
+  it('should contain a table with at list of one or more movies',
     async(() => {
       const table = fixture.nativeElement
         .querySelector('table.mat-table');

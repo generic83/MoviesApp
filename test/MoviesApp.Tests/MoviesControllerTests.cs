@@ -90,6 +90,39 @@ namespace MoviesApp.Tests
             
         }
 
-       
+        [Test]
+        public static async Task GetMovies_With_TitleFilterQuery_Retunrs_DataFilteredByTitle()
+        {
+            //Arrange
+            var sourceMoviesCount = 3;
+            var sourceTitleQuery = "TheFi";
+            var movies = _builder.CreateListOfSize<Movie>(sourceMoviesCount)
+                .TheFirst(1).With(x => x.Title = "TheFirstTitle")
+                .TheNext(1).With(x => x.Title = "theFirstMovieTitle")
+                .TheLast(1).With(x => x.Title = "TheSecondTitle")
+                .Build();
+            var expectedMoviesCount = 2;
+
+            using (var context = new MovieInMemoryDbContext(_options))
+            {
+                context.AddRange(movies);
+                context.SaveChanges();
+            }
+
+            //Act
+            MovieApiResult actual = null;
+            using (var context = new MovieInMemoryDbContext(_options))
+            {
+                var movieRepository = new MovieRepository(context);
+                var controller = new MoviesController(movieRepository);
+                actual = (await controller.GetMovies(0, 10, null, null, sourceTitleQuery)).Value;
+                context.Database.EnsureDeleted();
+            }
+
+            //Assert
+            actual.Should().NotBeNull();
+            actual.Data.Count(x => x.Title.ToLower().Contains(sourceTitleQuery.ToLower())).Should().Be(expectedMoviesCount);
+
+        }
     }
 }
