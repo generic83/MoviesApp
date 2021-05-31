@@ -45,6 +45,11 @@ export class MovieService {
     return this.http.get<ApiResult>(url, { params });
   }
 
+  get<T>(id): Observable<T> {
+    const url = this.baseUrl + "api/Movies/" + id;
+    return this.http.get<T>(url);
+  }
+
   getAvailableLanguages() {
     const url = this.baseUrl + "api/Movies/AvailableLanguages";
     return this.http.get<any>(url);

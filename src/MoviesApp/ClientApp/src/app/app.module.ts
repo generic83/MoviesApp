@@ -10,13 +10,15 @@ import { HomeComponent } from './home/home.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from './angular-material.module';import { MovieService } from './movies/movie.service';
 import { MoviesComponent } from './movies/movies.component';
+import { MovieDetailsComponent } from './movies/movie-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    MoviesComponent
+    MoviesComponent,
+    MovieDetailsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -24,7 +26,8 @@ import { MoviesComponent } from './movies/movies.component';
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'movies', component: MoviesComponent }
+      { path: 'movies', component: MoviesComponent },
+      { path: 'details/:id', component: MovieDetailsComponent }
     ]),
     BrowserAnimationsModule,
     AngularMaterialModule

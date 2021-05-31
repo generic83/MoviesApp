@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ApiResult, MovieService } from './movie.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-movies',
@@ -28,7 +29,7 @@ export class MoviesComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
-  constructor(private movieService: MovieService) {
+  constructor(private movieService: MovieService, private _router: Router) {
   }
 
   ngOnInit() {
@@ -92,5 +93,9 @@ export class MoviesComponent implements OnInit {
   onLocationChange(event) {
     this.location = event.value;
     this.loadData(this.filterQuery);
+  }
+
+  onRowClick(row: Movie) {
+    this._router.navigateByUrl(`details/${row.id}`);
   }
 }

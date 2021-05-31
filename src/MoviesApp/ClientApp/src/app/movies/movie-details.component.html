@@ -1,0 +1,49 @@
+<p *ngIf="!selectedMovie"><em>Loading...</em></p>
+<button *ngIf="selectedMovie" routerLink="/movies" type="button" class="btn btn-outline-secondary">Back</button>
+<div *ngIf="selectedMovie" class="movie-details-container">
+  <div class="row">
+    <div class="col">
+      <fieldset>
+        <p>
+          <span class="font-weight-bold">Title:</span>
+          {{ selectedMovie.title | titlecase}}
+        </p>
+        <p>
+          <span class="font-weight-bold">Language:</span>
+          {{ selectedMovie.language | titlecase}}
+        </p>
+        <p>
+          <span class="font-weight-bold">Location:</span>
+          {{ selectedMovie.location | titlecase}}
+        </p>
+        <p>
+          <span class="font-weight-bold">Listing Type:</span>
+          {{ selectedMovie.listingType }}
+        </p>
+        <p>
+          <span class="font-weight-bold">Imdb Rating:</span>
+          {{ selectedMovie.imdbRating }}
+        </p>
+        <p *ngIf="selectedMovie.soundEffects">
+          <span class="font-weight-bold">Sound Effect:</span>
+          {{ selectedMovie.soundEffects.join(', ') }}
+        </p>
+        <p>
+          <span class="font-weight-bold">Plot:</span>
+          {{ selectedMovie.plot }}
+        </p>
+      </fieldset>
+    </div>
+    <div class="col">
+      <div>
+        <img src="{{ selectedMovie.poster }}" height="300" />
+      </div>
+      <br />
+      <div>
+        <span *ngFor="let still of selectedMovie.stills">
+          <img [src]='still' height="100" />
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
