@@ -63,7 +63,7 @@
   <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onRowClick(row)"></tr>
 </table>
 <mat-paginator [hidden]="!movies"
-               [pageSize]="10"
+               [pageSize]="5"
                (page)="pageEvent = getData($event)"
                [pageSizeOptions]="[5, 10, 15]"
                showFirstLastButtons></mat-paginator>

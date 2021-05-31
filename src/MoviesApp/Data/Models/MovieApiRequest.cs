@@ -8,7 +8,7 @@ namespace MoviesApp.Data.Models
         public int PageIndex { get; set; } = 0;
 
         [FromQuery]
-        public int PageSize { get; set; } = 10;
+        public int PageSize { get; set; } = 5;
 
         [FromQuery]
         public string SortColumn { get; set; } = null;

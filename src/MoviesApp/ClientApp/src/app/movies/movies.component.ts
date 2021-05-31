@@ -17,7 +17,7 @@ export class MoviesComponent implements OnInit {
   public displayedColumns: string[] = ['imdbId', 'title', 'language', 'location', 'imdbRating'];
 
   defaultPageIndex = 0;
-  defaultPageSize = 10;
+  defaultPageSize = 5;
   defaultSortColumn = "title";
   defaultSortOrder = "asc";
   filterQuery: string = null;
@@ -26,7 +26,7 @@ export class MoviesComponent implements OnInit {
   language: string = null;
   location: string = null;
 
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
   constructor(private movieService: MovieService, private _router: Router) {

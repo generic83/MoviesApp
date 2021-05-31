@@ -39,11 +39,9 @@
         <img src="{{ selectedMovie.poster }}" height="300" />
       </div>
       <br />
-      <div>
-        <span *ngFor="let still of selectedMovie.stills">
-          <img [src]='still' height="100" />
-        </span>
+          <div *ngFor="let still of selectedMovie.stills" class="float-left">
+            <img [src]='still' height="100" />
+        </div>
       </div>
-    </div>
   </div>
 </div>
