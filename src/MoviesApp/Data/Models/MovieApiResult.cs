@@ -25,8 +25,20 @@ namespace MoviesApp.Data.Models
                                                              int pageSize,
                                                              string sortColumn,
                                                              string sortOrder,
-                                                             string titleFilterQuery)
+                                                             string titleFilterQuery,
+                                                             string language,
+                                                             string location)
         {
+            if (!string.IsNullOrEmpty(language))
+            {
+                source = source.Where(x => x.Language.Equals(language, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(location))
+            {
+                source = source.Where(x => x.Location.Equals(location, StringComparison.OrdinalIgnoreCase));
+            }
+
             if (!string.IsNullOrEmpty(titleFilterQuery))
             {
                 source = source.Where(x => x.Title.ToLowerInvariant().Contains(titleFilterQuery.ToLowerInvariant()));

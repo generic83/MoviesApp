@@ -6,6 +6,7 @@ using MoviesApp.Data;
 using MoviesApp.Data.Models;
 using MoviesApp.Data.Models.Entities;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -122,7 +123,77 @@ namespace MoviesApp.Tests
             //Assert
             actual.Should().NotBeNull();
             actual.Data.Count(x => x.Title.ToLower().Contains(sourceTitleQuery.ToLower())).Should().Be(expectedMoviesCount);
+        }
+        [Test]
+        public static async Task GetAllLanguages_Returns_DistinctLanguages()
+        {
+            //Arrange
+            var sourceMoviesCount = 3;
+            var expectedDistinctLanguages = 2;
+            var movies = _builder.CreateListOfSize<Movie>(sourceMoviesCount)
+                .TheFirst(1)
+                .With(x => x.Language = "English")
+                .TheNext(1)
+                .With(x => x.Language = "english")
+                .TheLast(1)
+                .With(x => x.Language = "Danish")
+                .Build();
 
+            using (var context = new MovieInMemoryDbContext(_options))
+            {
+                context.AddRange(movies);
+                context.SaveChanges();
+            }
+
+            //Act
+            ICollection<string> actual = null;
+            using (var context = new MovieInMemoryDbContext(_options))
+            {
+                var movieRepository = new MovieRepository(context);
+                var controller = new MoviesController(movieRepository);
+                actual = (await controller.GetAllLanguages());
+                context.Database.EnsureDeleted();
+            }
+
+            //Assert
+            actual.Should().NotBeNull();
+            actual.Count.Should().Be(expectedDistinctLanguages);
+        }
+
+        [Test]
+        public static async Task GetAllLocations_Returns_DistinctLocations()
+        {
+            //Arrange
+            var sourceMoviesCount = 3;
+            var expectedLocations = 3;
+            var movies = _builder.CreateListOfSize<Movie>(sourceMoviesCount)
+                .TheFirst(1)
+                .With(x => x.Language = "Copenhagne")
+                .TheNext(1)
+                .With(x => x.Language = "London")
+                .TheLast(1)
+                .With(x => x.Language = "Delhi")
+                .Build();
+
+            using (var context = new MovieInMemoryDbContext(_options))
+            {
+                context.AddRange(movies);
+                context.SaveChanges();
+            }
+
+            //Act
+            ICollection<string> actual = null;
+            using (var context = new MovieInMemoryDbContext(_options))
+            {
+                var movieRepository = new MovieRepository(context);
+                var controller = new MoviesController(movieRepository);
+                actual = (await controller.GetAllLocations());
+                context.Database.EnsureDeleted();
+            }
+
+            //Assert
+            actual.Should().NotBeNull();
+            actual.Count.Should().Be(expectedLocations);
         }
     }
 }

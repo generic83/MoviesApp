@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoviesApp.Data.Models;
 using MoviesStore.Data;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MoviesApp.Controllers
@@ -17,10 +18,30 @@ namespace MoviesApp.Controllers
 
         [HttpGet]
         [Route("{pageIndex?}/{pageSize?}")]
-        public async Task<ActionResult<MovieApiResult>> GetMovies(int pageIndex = 0, int pageSize = 10, string sortColumn = null, string sortOrder = null, string filterQuery = null)
+        public async Task<ActionResult<MovieApiResult>> GetMovies(int pageIndex = 0,
+                                                                  int pageSize = 10,
+                                                                  string sortColumn = null,
+                                                                  string sortOrder = null,
+                                                                  string filterQuery = null,
+                                                                  string language = null,
+                                                                  string location = null)
         {
 
-            return await MovieApiResult.CreateAsync(_repository.GetAllAsQueryable(), pageIndex, pageSize, sortColumn, sortOrder, filterQuery);
+            return await MovieApiResult.CreateAsync(_repository.GetAllAsQueryable(), pageIndex, pageSize, sortColumn, sortOrder, filterQuery, language, location);
+        }
+
+        [HttpGet]
+        [Route("AvailableLanguages")]
+        public async Task<ICollection<string>> GetAllLanguages()
+        {
+            return await _repository.GetAllLanguagesAsync();
+        }
+
+        [HttpGet]
+        [Route("AvailableLocations")]
+        public async Task<ICollection<string>> GetAllLocations()
+        {
+            return await _repository.GetAllLocationsAsync();
         }
     }
 }
