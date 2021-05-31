@@ -18,7 +18,9 @@ export class MovieService {
     pageSize: number,
     sortColumn: string,
     sortOrder: string,
-    filterQuery: string): Observable<ApiResult> {
+    filterQuery: string,
+    language: string,
+    location: string): Observable<ApiResult> {
     const url = this.baseUrl + 'api/Movies';
     let params = new HttpParams()
       .set("pageIndex", pageIndex.toString())
@@ -31,7 +33,26 @@ export class MovieService {
         .set("filterQuery", filterQuery);
     }
 
+    if (language && language !== "All") {
+      params = params
+        .set("language", language);
+    }
+    if (location && location !== "All") {
+      params = params
+        .set("location", location);
+    }
+
     return this.http.get<ApiResult>(url, { params });
+  }
+
+  getAvailableLanguages() {
+    const url = this.baseUrl + "api/Movies/AvailableLanguages";
+    return this.http.get<any>(url);
+  }
+
+  getAvailableLocations() {
+    const url = this.baseUrl + "api/Movies/AvailableLocations";
+    return this.http.get<any>(url);
   }
 }
 

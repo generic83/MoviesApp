@@ -20,6 +20,10 @@ export class MoviesComponent implements OnInit {
   defaultSortColumn = "title";
   defaultSortOrder = "asc";
   filterQuery: string = null;
+  availableLanguages: string[] = null;
+  availableLocations: string[] = null;
+  language: string = null;
+  location: string = null;
 
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -29,6 +33,19 @@ export class MoviesComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
+    this.populateSelectFilters();
+  }
+
+
+  populateSelectFilters() {
+    this.movieService.getAvailableLanguages()
+      .subscribe(data => {
+        this.availableLanguages = data;
+      }, error => console.error(error));
+    this.movieService.getAvailableLocations()
+      .subscribe(data => {
+        this.availableLocations = data;
+      }, error => console.error(error));
   }
 
   loadData(query: string = null) {
@@ -55,7 +72,9 @@ export class MoviesComponent implements OnInit {
       event.pageSize,
       sortColumn,
       sortOrder,
-      filterQuery)
+      filterQuery,
+      this.language,
+      this.location)
       .subscribe(result => {
         this.sort.disableClear = true;
         this.paginator.length = result.totalCount;
@@ -63,5 +82,15 @@ export class MoviesComponent implements OnInit {
         this.paginator.pageSize = result.pageSize;
         this.movies = new MatTableDataSource<Movie>(result.data);
       }, error => console.error(error));
+  }
+
+  onLanguageChange(event) {
+    this.language = event.value;
+    this.loadData(this.filterQuery);
+  }
+
+  onLocationChange(event) {
+    this.location = event.value;
+    this.loadData(this.filterQuery);
   }
 }
