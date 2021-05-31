@@ -9,6 +9,8 @@ namespace MoviesStore.Data
     {
         IQueryable<Movie> GetAllAsQueryable();
 
+        Task<Movie> GetByIdAsync(int id);
+
         Task<ICollection<string>> GetAllLanguagesAsync();
 
         Task<ICollection<string>> GetAllLocationsAsync();
