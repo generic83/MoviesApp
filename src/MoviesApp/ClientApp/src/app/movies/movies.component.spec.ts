@@ -14,7 +14,7 @@ describe('MoviesComponent', () => {
   // async beforeEach()
   beforeEach(async(() => {
     const movieService = jasmine.createSpyObj<MovieService>('MovieService',
-      ['getData']);
+      ['getData', 'getAvailableLanguages', 'getAvailableLocations']);
     movieService.getData.and.returnValue(
       of<ApiResult<Movie>>({
         data: [
@@ -44,6 +44,9 @@ describe('MoviesComponent', () => {
         pageIndex: 0,
         pageSize: 10
       } as ApiResult<Movie>));
+
+    movieService.getAvailableLanguages.and.returnValue(of<any>(["TestLanguage1", "TestLanguage2", "TestLanguage3"]));
+    movieService.getAvailableLocations.and.returnValue(of<any>(["TestLocation1", "TestLocation2", "TestLocation3"]));
 
     const router = jasmine.createSpyObj<Router>('Router',['navigateByUrl']);
 
@@ -94,4 +97,16 @@ describe('MoviesComponent', () => {
         .querySelectorAll('tr.mat-row');
       expect(tableRows.length).toBeGreaterThan(0);
     }));
+
+  it('should contain a language select filter', async(() => {
+    const languageSelectFilter = fixture.nativeElement
+      .querySelectorAll('.mat-form-field-type-mat-select')[0];
+    expect(languageSelectFilter.textContent).toContain('select language');
+  }));
+
+  it('should contain location select filter', async(() => {
+    const locationSelectFilter = fixture.nativeElement
+      .querySelectorAll('.mat-form-field-type-mat-select')[1];
+    expect(locationSelectFilter.textContent).toContain('select location');
+  }));
 });
