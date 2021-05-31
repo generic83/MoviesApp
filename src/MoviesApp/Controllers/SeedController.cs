@@ -37,8 +37,8 @@ namespace MoviesApp.Controllers
             }
 
             using var openStream = _file.OpenRead("Data/Source/movies.json");
-            var data = _jsonConvert.DeserializeAsync<ICollection<MovieJsonModel>>(openStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
-            foreach (var item in data)
+            var data = _jsonConvert.DeserializeAsync<MovieJsonModel>(openStream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
+            foreach (var item in data.Movies)
             {
                 var movie = new Movie
                 {

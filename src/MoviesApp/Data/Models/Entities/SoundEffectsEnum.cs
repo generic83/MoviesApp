@@ -7,6 +7,8 @@ namespace MoviesApp.Data.Models.Entities
     {
         None = 0,
         RX6 = 1,
-        SDDS = 2
+        SDDS = 2,
+        DOLBY = 4,
+        DTS = 8
     }
 }
