@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace MoviesApp.Data.Models.Entities
 {
@@ -26,8 +28,16 @@ namespace MoviesApp.Data.Models.Entities
 
         public string ImdbRating { get; set; }
 
+        [JsonIgnore]
         public SoundEffectsEnum SoundEffectsEnum { get; set; }
 
+        [JsonIgnore]
         public ICollection<MovieStill> MovieStills { get; set; }
+
+        [NotMapped]
+        public string[] SoundEffects => SoundEffectsEnum.ToString().Split(",");
+
+        [NotMapped]
+        public string[] Stills => MovieStills?.Select(x => x.Source).ToArray();
     }
 }
