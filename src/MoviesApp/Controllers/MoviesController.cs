@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoviesApp.Data.Models;
+using MoviesApp.Data.Models.Entities;
 using MoviesStore.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,6 +22,19 @@ namespace MoviesApp.Controllers
         public async Task<ActionResult<MovieApiResult>> GetMovies([FromRoute]MovieApiRequest request)
         {
            return await MovieApiResult.CreateAsync(_repository.GetAllAsQueryable(), request);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<Movie>> GetById(int id)
+        {
+            var movie = await _repository.GetByIdAsync(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            return movie;
         }
 
         [HttpGet]

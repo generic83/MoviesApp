@@ -1,5 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoviesApp.Controllers;
 using MoviesApp.Data;
@@ -201,6 +202,78 @@ namespace MoviesApp.Tests
             //Assert
             actual.Should().NotBeNull();
             actual.Count.Should().Be(expectedLocations);
+        }
+
+        [Test]
+        public static async Task GetById_Retunrs_Movie()
+        {
+            //Arrange
+            var sourceMoviesCount = 3;
+            var sourceId = 1;
+            var sourceImdbId = _faker.Random.String(20);
+            var sourceStillsCount = 3;
+            var sourceStills = _builder.CreateListOfSize<MovieStill>(sourceStillsCount).Build().ToArray();
+            var movies = _builder.CreateListOfSize<Movie>(sourceMoviesCount)
+                .TheFirst(1)
+                .With(x => x.Id = sourceId)
+                .With(x => x.ImdbId = sourceImdbId)
+                .With(x => x.MovieStills = sourceStills)
+                .Build();
+
+            var options = DbContextOptions;
+            using (var context = new MovieInMemoryDbContext(options))
+            {
+                context.AddRange(movies);
+                context.SaveChanges();
+            }
+
+            //Act
+            Movie actual = null;
+            using (var context = new MovieInMemoryDbContext(options))
+            {
+                var movieRepository = new MovieRepository(context);
+                var controller = new MoviesController(movieRepository);
+                actual = (await controller.GetById(sourceId)).Value;
+                context.Database.EnsureDeleted();
+            }
+
+            //Assert
+            actual.Should().NotBeNull();
+            actual.Stills.Length.Should().Be(sourceStillsCount);
+            actual.ImdbId.Should().Be(sourceImdbId);
+        }
+
+        [Test]
+        public static async Task GetById_Returns_NotFoundStatusCode()
+        {
+            //Arrange
+            var sourceMoviesCount = 1;
+            var sourceId = 1;
+            var movies = _builder.CreateListOfSize<Movie>(sourceMoviesCount)
+                .TheFirst(1)
+                .With(x => x.Id = sourceId)
+                .Build();
+
+            var nonExistingId = 2;
+
+            var options = DbContextOptions;
+            using (var context = new MovieInMemoryDbContext(options))
+            {
+                context.AddRange(movies);
+                context.SaveChanges();
+            }
+
+            StatusCodeResult result;
+            using (var context = new MovieInMemoryDbContext(options))
+            {
+                var movieRepository = new MovieRepository(context);
+                var controller = new MoviesController(movieRepository);
+                result = (await controller.GetById(nonExistingId)).Result as StatusCodeResult;
+                context.Database.EnsureDeleted();
+            }
+
+            //Assert
+            result.StatusCode.Should().Be(404);
         }
 
         private static DbContextOptions DbContextOptions => new DbContextOptionsBuilder<MovieInMemoryDbContext>().UseInMemoryDatabase(databaseName: $"MoviesControllerTestDb{Guid.NewGuid()}").Options;
