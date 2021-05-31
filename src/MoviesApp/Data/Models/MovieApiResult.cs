@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MoviesApp.Data.Models.Entities;
+using System.Reflection;
+using System.Linq.Dynamic.Core;
 
 namespace MoviesApp.Data.Models
 {
@@ -20,10 +22,19 @@ namespace MoviesApp.Data.Models
 
         public static async Task<MovieApiResult> CreateAsync(IQueryable<Movie> source,
                                                              int pageIndex,
-                                                             int pageSize)
+                                                             int pageSize, string sortColumn, string sortOrder)
         {
 
             var count = await source.CountAsync();
+
+            if (!string.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn))
+            {
+                sortOrder = !string.IsNullOrEmpty(sortOrder) && sortOrder.ToUpper() == "ASC" ?
+                    "ASC" :
+                    "DESC";
+
+                source = source.OrderBy($"{sortColumn} {sortOrder}");
+            }
 
             var data = await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync();
 
@@ -43,5 +54,16 @@ namespace MoviesApp.Data.Models
         public bool HasPreviousPage => PageIndex > 0;
 
         public bool HasNextPage => PageIndex + 1 < TotalPages;
+
+        static bool IsValidProperty(string propertyName, bool throwExceptionIfNotFound = true)
+        {
+            var proppertyInfo = typeof(Movie).GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            if (proppertyInfo == null && throwExceptionIfNotFound)
+            {
+                throw new NotSupportedException($"ERROR: Property '{propertyName}' does not exist.");
+            }
+
+            return proppertyInfo != null;
+        }
     }
 }

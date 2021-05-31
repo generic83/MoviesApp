@@ -17,10 +17,10 @@ namespace MoviesApp.Controllers
 
         [HttpGet]
         [Route("{pageIndex?}/{pageSize?}")]
-        public async Task<ActionResult<MovieApiResult>> GetMovies(int pageIndex = 0, int pageSize = 10)
+        public async Task<ActionResult<MovieApiResult>> GetMovies(int pageIndex = 0, int pageSize = 10, string sortColumn = null, string sortOrder = null)
         {
 
-            return await MovieApiResult.CreateAsync(_repository.GetAllAsQueryable(), pageIndex, pageSize);
+            return await MovieApiResult.CreateAsync(_repository.GetAllAsQueryable(), pageIndex, pageSize, sortColumn, sortOrder);
         }
     }
 }

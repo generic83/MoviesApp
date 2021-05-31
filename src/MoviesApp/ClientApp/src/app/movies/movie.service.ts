@@ -15,12 +15,16 @@ export class MovieService {
 
   getData<ApiResult>(
     pageIndex: number,
-    pageSize: number
+    pageSize: number,
+    sortColumn,
+    sortOrder
   ): Observable<ApiResult> {
     const url = this.baseUrl + 'api/Movies';
     const params = new HttpParams()
       .set("pageIndex", pageIndex.toString())
-      .set("pageSize", pageSize.toString());
+      .set("pageSize", pageSize.toString())
+      .set("sortColumn", sortColumn)
+      .set("sortOrder", sortOrder);
    
     return this.http.get<ApiResult>(url, { params });
   }
@@ -32,4 +36,6 @@ export class MovieService {
   pageSize: number;
   totalCount: number;
   totalPages: number;
+  sortColumn: string;
+  sortOrder: string;
 }
