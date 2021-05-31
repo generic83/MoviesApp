@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 
 export class MoviesComponent implements OnInit {
   public movies: MatTableDataSource<Movie>;
-  public displayedColumns: string[] = ['imdbId', 'title', 'language', 'location', 'imdbRating'];
+  public displayedColumns: string[] = ['title', 'language', 'location', 'imdbRating', 'poster'];
 
   defaultPageIndex = 0;
   defaultPageSize = 5;
