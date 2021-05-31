@@ -6,6 +6,7 @@ using MoviesApp.Data;
 using MoviesApp.Data.Models;
 using MoviesApp.Data.Models.Entities;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +16,6 @@ namespace MoviesApp.Tests
     public class MoviesControllerTests
     {
         private static Builder _builder;
-        private static DbContextOptions<MovieInMemoryDbContext> _options;
         private static Bogus.Faker _faker;
 
         [SetUp]
@@ -24,7 +24,6 @@ namespace MoviesApp.Tests
             _faker = new Bogus.Faker();
             var builderSettings = new BuilderSettings();
             _builder = new Builder(builderSettings);
-            _options = new DbContextOptionsBuilder<MovieInMemoryDbContext>().UseInMemoryDatabase(databaseName: "MoviesControllerTestDb").Options;
         }
 
         [Test]
@@ -34,7 +33,8 @@ namespace MoviesApp.Tests
             var sourceMoviesCount = 10;
             var movies = _builder.CreateListOfSize<Movie>(sourceMoviesCount).Build();
 
-            using (var context = new MovieInMemoryDbContext(_options))
+            var options = DbContextOptions;
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 context.AddRange(movies);
                 context.SaveChanges();
@@ -42,11 +42,11 @@ namespace MoviesApp.Tests
 
             //Act
             MovieApiResult actual = null;
-            using (var context = new MovieInMemoryDbContext(_options))
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 var movieRepository = new MovieRepository(context);
                 var controller = new MoviesController(movieRepository);
-                actual = (await controller.GetMovies()).Value;
+                actual = (await controller.GetMovies(new MovieApiRequest())).Value;
                 context.Database.EnsureDeleted();
             }
 
@@ -62,14 +62,17 @@ namespace MoviesApp.Tests
             var sourceMoviesCount = 10;
             var sourcePageSize = 5;
             var sourceSortColumn = "language";
-            var sourceOrder = "DESC";
+            var sourceSortOrder = "DESC";
             var movies = _builder.CreateListOfSize<Movie>(sourceMoviesCount)
                 .TheFirst(3).With(x => x.Language = "Language1")
                 .TheNext(3).With(x => x.Language = "Language3")
                 .TheNext(3).With(x => x.Language = "Language2")
                 .Build();
 
-            using (var context = new MovieInMemoryDbContext(_options))
+            var sourecApiRequest = new MovieApiRequest { PageSize = sourcePageSize, SortColumn = sourceSortColumn, SortOrder = sourceSortOrder };
+            
+            var options = DbContextOptions;
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 context.AddRange(movies);
                 context.SaveChanges();
@@ -77,18 +80,18 @@ namespace MoviesApp.Tests
 
             //Act
             MovieApiResult actual = null;
-            using (var context = new MovieInMemoryDbContext(_options))
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 var movieRepository = new MovieRepository(context);
                 var controller = new MoviesController(movieRepository);
-                actual = (await controller.GetMovies(0, sourcePageSize, sourceSortColumn, sourceOrder)).Value;
+                actual = (await controller.GetMovies(sourecApiRequest)).Value;
                 context.Database.EnsureDeleted();
             }
 
             //Assert
             actual.Should().NotBeNull();
             actual.Data.First().Language.Should().Be("Language3");
-            
+
         }
 
         [Test]
@@ -103,8 +106,10 @@ namespace MoviesApp.Tests
                 .TheLast(1).With(x => x.Title = "TheSecondTitle")
                 .Build();
             var expectedMoviesCount = 2;
+            var sourecApiRequest = new MovieApiRequest { FilterQuery = sourceTitleQuery };
 
-            using (var context = new MovieInMemoryDbContext(_options))
+            var options = DbContextOptions;
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 context.AddRange(movies);
                 context.SaveChanges();
@@ -112,11 +117,11 @@ namespace MoviesApp.Tests
 
             //Act
             MovieApiResult actual = null;
-            using (var context = new MovieInMemoryDbContext(_options))
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 var movieRepository = new MovieRepository(context);
                 var controller = new MoviesController(movieRepository);
-                actual = (await controller.GetMovies(0, 10, null, null, sourceTitleQuery)).Value;
+                actual = (await controller.GetMovies(sourecApiRequest)).Value;
                 context.Database.EnsureDeleted();
             }
 
@@ -139,7 +144,8 @@ namespace MoviesApp.Tests
                 .With(x => x.Language = "Danish")
                 .Build();
 
-            using (var context = new MovieInMemoryDbContext(_options))
+            var options = DbContextOptions;
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 context.AddRange(movies);
                 context.SaveChanges();
@@ -147,7 +153,7 @@ namespace MoviesApp.Tests
 
             //Act
             ICollection<string> actual = null;
-            using (var context = new MovieInMemoryDbContext(_options))
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 var movieRepository = new MovieRepository(context);
                 var controller = new MoviesController(movieRepository);
@@ -175,7 +181,8 @@ namespace MoviesApp.Tests
                 .With(x => x.Language = "Delhi")
                 .Build();
 
-            using (var context = new MovieInMemoryDbContext(_options))
+            var options = DbContextOptions;
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 context.AddRange(movies);
                 context.SaveChanges();
@@ -183,7 +190,7 @@ namespace MoviesApp.Tests
 
             //Act
             ICollection<string> actual = null;
-            using (var context = new MovieInMemoryDbContext(_options))
+            using (var context = new MovieInMemoryDbContext(options))
             {
                 var movieRepository = new MovieRepository(context);
                 var controller = new MoviesController(movieRepository);
@@ -195,5 +202,7 @@ namespace MoviesApp.Tests
             actual.Should().NotBeNull();
             actual.Count.Should().Be(expectedLocations);
         }
+
+        private static DbContextOptions DbContextOptions => new DbContextOptionsBuilder<MovieInMemoryDbContext>().UseInMemoryDatabase(databaseName: $"MoviesControllerTestDb{Guid.NewGuid()}").Options;
     }
 }

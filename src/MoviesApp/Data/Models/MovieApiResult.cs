@@ -20,44 +20,37 @@ namespace MoviesApp.Data.Models
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         }
 
-        public static async Task<MovieApiResult> CreateAsync(IQueryable<Movie> source,
-                                                             int pageIndex,
-                                                             int pageSize,
-                                                             string sortColumn,
-                                                             string sortOrder,
-                                                             string titleFilterQuery,
-                                                             string language,
-                                                             string location)
+        public static async Task<MovieApiResult> CreateAsync(IQueryable<Movie> source, MovieApiRequest request)
         {
-            if (!string.IsNullOrEmpty(language))
+            if (!string.IsNullOrEmpty(request.Language))
             {
-                source = source.Where(x => x.Language.Equals(language, StringComparison.OrdinalIgnoreCase));
+                source = source.Where(x => x.Language.Equals(request.Language, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!string.IsNullOrEmpty(location))
+            if (!string.IsNullOrEmpty(request.Location))
             {
-                source = source.Where(x => x.Location.Equals(location, StringComparison.OrdinalIgnoreCase));
+                source = source.Where(x => x.Location.Equals(request.Location, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!string.IsNullOrEmpty(titleFilterQuery))
+            if (!string.IsNullOrEmpty(request.FilterQuery))
             {
-                source = source.Where(x => x.Title.ToLowerInvariant().Contains(titleFilterQuery.ToLowerInvariant()));
+                source = source.Where(x => x.Title.ToLowerInvariant().Contains(request.FilterQuery.ToLowerInvariant()));
             }
 
-            if (!string.IsNullOrEmpty(sortColumn) && IsValidProperty(sortColumn))
+            if (!string.IsNullOrEmpty(request.SortColumn) && IsValidProperty(request.SortColumn))
             {
-                sortOrder = !string.IsNullOrEmpty(sortOrder) && sortOrder.ToUpper() == "ASC" ?
+                var sortOrder = !string.IsNullOrEmpty(request.SortOrder) && request.SortOrder.ToUpper() == "ASC" ?
                     "ASC" :
                     "DESC";
 
-                source = source.OrderBy($"{sortColumn} {sortOrder}");
+                source = source.OrderBy($"{request.SortColumn} {sortOrder}");
             }
 
             var count = await source.CountAsync();
 
-            var data = await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync();
+            var data = await source.Skip(request.PageIndex * request.PageSize).Take(request.PageSize).ToListAsync();
 
-            return new MovieApiResult(data, count, pageIndex, pageSize);
+            return new MovieApiResult(data, count, request.PageIndex, request.PageSize);
         }
 
         public List<Movie> Data { get; private set; }
