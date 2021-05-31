@@ -18,8 +18,7 @@
 ## About the project
 The project allows users to view movies-related data, as well as sort, search, and filter data based on movie title, language and location.  
 
-The UI naviation menu consists of two items, Home and Movies. The Movies page displays a grid with features for sorting, searching, and filtering.     
-In addition, the grid supports server-side pagination, which is a more scalable solution, where only a subset of the data, requested by the client, is returned.
+The UI naviation menu consists of two items, Home and Movies. The Movies page displays a grid with features for sorting, searching, and filtering. In addition, the grid supports server-side pagination, which is a more scalable solution, where only a subset of the data, requested by the client, is returned.
 
 The project uses a JSON file, movies.json, as its data source, and  for the sake of simplicity, the solution exposes an API to import data from the file into memory.  An in-memory database is used to improve performance by reducing the overhead required in generating content. The existing data model supports other database providers such as SQL Server.
 The backend also exposes another API to allow the frondend to query movies-related data.  
