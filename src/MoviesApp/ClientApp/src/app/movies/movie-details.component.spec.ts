@@ -75,9 +75,9 @@ describe('MoviesDetailsComponent', () => {
     async(() => {
       const detailsElements = fixture.nativeElement
         .querySelectorAll('p');
-      expect(detailsElements.length).toEqual(7);
+      expect(detailsElements.length).toEqual(8);
 
-      const expectedFields = ['Title', 'Language', 'Location', 'Listing Type', 'Imdb Rating', 'Sound Effect', 'Plot'];
+      const expectedFields = ['Title', 'Language', 'Location', 'Listing Type', 'Imdb Rating', 'Imdb Id', 'Sound Effect', 'Plot'];
       detailsElements.forEach(x => {
         expect(expectedFields.indexOf(x) > 1)
       });
